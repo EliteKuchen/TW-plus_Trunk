@@ -1,0 +1,47 @@
+
+##### language indices #####
+
+bosnian
+== Bosanski
+
+czech
+== Česky
+
+dutch
+== Nederlands
+
+finnish
+== Suomi
+
+french
+== Français
+
+german
+== Deutsch
+
+italian
+== Italiano
+
+polish
+== Polski
+
+portuguese
+== Português
+
+romanian
+== Română
+
+russian
+== Русский
+
+serbian
+== Srpski
+
+spanish
+== Español
+
+swedish
+== Svenska
+
+ukrainian
+== Українська

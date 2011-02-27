@@ -1,0 +1,18 @@
+Gametypes: iDM, iCTF, iTDM, DM, CTF, TDM
+Specials: 
+	- OpenSource ;D
+	- Instagib
+	- Killingspree
+	- Anticamper
+
+Variables: 
+	- sv_killingspree <1>
+	- sv_killingspree_kills <5>
+	- sv_killingspree_tag <1>
+	
+	- sv_anticamper <0>
+	- sv_anticamper_range <100>
+	- sv_anticamper_time <10>
+
+Todo:
+	- ?
