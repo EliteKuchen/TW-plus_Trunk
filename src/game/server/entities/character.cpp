@@ -713,8 +713,8 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	if(GameServer()->m_pController->IsFriendlyFire(m_pPlayer->GetCID(), From) && !g_Config.m_SvTeamdamage)
 		return false;
 
-	if(GameServer()->m_pController->is_instagib() && Weapon == WEAPON_GAME)
-		return false;
+	//if(GameServer()->m_pController->is_instagib() && Weapon == WEAPON_GAME)
+		//return false;
 
 	if(GameServer()->m_pController->is_instagib() && Weapon == WEAPON_RIFLE)
 	{
@@ -722,6 +722,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 		{
 			GameServer()->CreateSound(GameServer()->m_apPlayers[From]->m_ViewPos, SOUND_HIT, CmaskOne(From));
 			Die(From, Weapon);
+			return true;
 		}
 	}
 

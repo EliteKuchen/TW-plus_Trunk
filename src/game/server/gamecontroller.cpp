@@ -124,32 +124,32 @@ bool IGameController::OnEntity(int Index, vec2 Pos)
 		m_aaSpawnPoints[1][m_aNumSpawnPoints[1]++] = Pos;
 	else if(Index == ENTITY_SPAWN_BLUE)
 		m_aaSpawnPoints[2][m_aNumSpawnPoints[2]++] = Pos;
-	else if(Index == ENTITY_ARMOR_1)
+	else if(Index == ENTITY_ARMOR_1 && !is_instagib())
 		Type = POWERUP_ARMOR;
-	else if(Index == ENTITY_HEALTH_1)
+	else if(Index == ENTITY_HEALTH_1 && !is_instagib())
 		Type = POWERUP_HEALTH;
-	else if(Index == ENTITY_WEAPON_SHOTGUN)
+	else if(Index == ENTITY_WEAPON_SHOTGUN && !is_instagib())
 	{
 		Type = POWERUP_WEAPON;
 		SubType = WEAPON_SHOTGUN;
 	}
-	else if(Index == ENTITY_WEAPON_GRENADE)
+	else if(Index == ENTITY_WEAPON_GRENADE && !is_instagib())
 	{
 		Type = POWERUP_WEAPON;
 		SubType = WEAPON_GRENADE;
 	}
-	else if(Index == ENTITY_WEAPON_RIFLE)
+	else if(Index == ENTITY_WEAPON_RIFLE && !is_instagib())
 	{
 		Type = POWERUP_WEAPON;
 		SubType = WEAPON_RIFLE;
 	}
-	else if(Index == ENTITY_POWERUP_NINJA && g_Config.m_SvPowerups)
+	else if(Index == ENTITY_POWERUP_NINJA && g_Config.m_SvPowerups && !is_instagib())
 	{
 		Type = POWERUP_NINJA;
 		SubType = WEAPON_NINJA;
 	}
 	
-	if(Type != -1 && !is_instagib())
+	if(Type != -1)
 	{
 		CPickup *pPickup = new CPickup(&GameServer()->m_World, Type, SubType);
 		pPickup->m_Pos = Pos;
@@ -330,8 +330,6 @@ int IGameController::OnCharacterDeath(class CCharacter *pVictim, class CPlayer *
 		Server()->SetClientName(pVictim->GetPlayer()->GetCID(), pVictim->GetPlayer()->start_name);
 	}
 
-	pVictim->GetPlayer()->killstreak = 0;
-
 	if(!pKiller || Weapon == WEAPON_GAME)
 		return 0;
 	if(pKiller == pVictim->GetPlayer())
@@ -343,8 +341,10 @@ int IGameController::OnCharacterDeath(class CCharacter *pVictim, class CPlayer *
 		else
 			pKiller->m_Score++; // normal kill
 	}
+	
+	pVictim->GetPlayer()->killstreak = 0;
 
-	if(pKiller != pVictim->GetPlayer())
+	if(pKiller && pKiller != pVictim->GetPlayer())
 	{
 		if(!(IsTeamplay() && pVictim->GetPlayer()->GetTeam() == pKiller->GetTeam()))
 		{
@@ -384,7 +384,9 @@ void IGameController::OnCharacterSpawn(class CCharacter *pChr)
 	pChr->IncreaseHealth(10);
 	
 	// give default weapons
-	if(!is_instagib())
+	if(is_instagib())
+		pChr->GiveWeapon(WEAPON_RIFLE, -1);
+	else
 	{
 		pChr->GiveWeapon(WEAPON_HAMMER, -1);
 		pChr->GiveWeapon(WEAPON_GUN, 10);
