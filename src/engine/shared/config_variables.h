@@ -89,9 +89,20 @@ MACRO_CONFIG_STR(DbgStressServer, dbg_stress_server, 32, "localhost", CFGFLAG_CL
 MACRO_CONFIG_INT(DbgResizable, dbg_resizable, 0, 0, 0, CFGFLAG_CLIENT, "Enables window resizing")
 
 MACRO_CONFIG_INT(SvKillingspree, sv_killingspree, 1, 0, 1, CFGFLAG_SERVER, "")
-MACRO_CONFIG_INT(SvKillingspree_kills, sv_killingspree_kills, 5, 1, 1000, CFGFLAG_SERVER, "")
-MACRO_CONFIG_INT(SvKillingspree_tag, sv_killingspree_tag, 1, 0, 1, CFGFLAG_SERVER, "")
+MACRO_CONFIG_INT(SvKillingspreeKills, sv_killingspree_kills, 5, 1, 1000, CFGFLAG_SERVER, "")
+MACRO_CONFIG_INT(SvKillingspreeTag, sv_killingspree_tag, 1, 0, 1, CFGFLAG_SERVER, "")
+MACRO_CONFIG_INT(SvKillingspreeAward, sv_killingspree_tag, 1, 0, 1, CFGFLAG_SERVER, "")
+MACRO_CONFIG_INT(SvKillingspreeAwardLasers, sv_killingspree_award_lasers, 3, 1, 10, CFGFLAG_SERVER, "")
+MACRO_CONFIG_INT(SvKillingspreeAwardLasersSplit, sv_killingspree_award_lasers_split, 3, 0, 10, CFGFLAG_SERVER, "")
+MACRO_CONFIG_INT(SvKillingspreeAwardReload, sv_killingspree_award_reload, 75, 1, 100, CFGFLAG_SERVER, "")
 MACRO_CONFIG_INT(SvAnticamper, sv_anticamper, 0, 0, 1, CFGFLAG_SERVER, "")
 MACRO_CONFIG_INT(SvAnticamperRange, sv_anticamper_range, 100, 0, 500, CFGFLAG_SERVER, "")
 MACRO_CONFIG_INT(SvAnticamperTime, sv_anticamper_time, 10, 0, 30, CFGFLAG_SERVER, "")
+
+MACRO_CONFIG_INT(SvLasers, sv_lasers, 1, 0, 10, CFGFLAG_SERVER, "")
+MACRO_CONFIG_INT(SvLasersSplit, sv_lasers_split, 5, 0, 10, CFGFLAG_SERVER, "")
+MACRO_CONFIG_INT(SvLaserReload, sv_laser_reload, 800, 0, 10000, CFGFLAG_SERVER, "")
+
+MACRO_CONFIG_INT(SvGrenadeReload, sv_grenade_reload, 500, 0, 10000, CFGFLAG_SERVER, "")
+MACRO_CONFIG_INT(SvGrenadeSelfdamage, sv_grenade_selfdamage, 500, 0, 10000, CFGFLAG_SERVER, "")
 #endif

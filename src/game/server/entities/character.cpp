@@ -413,7 +413,39 @@ void CCharacter::FireWeapon()
 		
 		case WEAPON_RIFLE:
 		{
-			new CLaser(GameWorld(), m_Pos, Direction, GameServer()->Tuning()->m_LaserReach, m_pPlayer->GetCID());
+			if(m_pPlayer->award)
+			{
+				if(g_Config.m_SvKillingspreeAwardLasers == 1)
+				{
+					new CLaser(GameWorld(), m_Pos, Direction, GameServer()->Tuning()->m_LaserReach, m_pPlayer->GetCID());
+				}
+				else
+				{
+					for(float i = -0.5f * g_Config.m_SvKillingspreeAwardLasers; i < 0.5f * g_Config.m_SvKillingspreeAwardLasers; i++)
+					{
+						float a = GetAngle(Direction);
+						a += i * 0.01f * (float)g_Config.m_SvKillingspreeAwardLasersSplit;
+						new CLaser(GameWorld(), m_Pos, normalize(vec2(cosf(a), sinf(a))), GameServer()->Tuning()->m_LaserReach, m_pPlayer->GetCID());
+					}
+				}
+			}
+			else
+			{
+				if(g_Config.m_SvLasers == 1)
+				{
+					new CLaser(GameWorld(), m_Pos, Direction, GameServer()->Tuning()->m_LaserReach, m_pPlayer->GetCID());
+				}
+				else
+				{
+					for(float i = -0.5f * g_Config.m_SvLasers; i < 0.5f * g_Config.m_SvLasers; i++)
+					{
+						float a = GetAngle(Direction);
+						a += i * 0.01f * (float)g_Config.m_SvLasersSplit;
+						new CLaser(GameWorld(), m_Pos, normalize(vec2(cosf(a), sinf(a))), GameServer()->Tuning()->m_LaserReach, m_pPlayer->GetCID());
+					}
+				}
+			}
+
 			GameServer()->CreateSound(m_Pos, SOUND_RIFLE_FIRE);
 		} break;
 		
@@ -435,9 +467,29 @@ void CCharacter::FireWeapon()
 	
 	if(m_aWeapons[m_ActiveWeapon].m_Ammo > 0) // -1 == unlimited
 		m_aWeapons[m_ActiveWeapon].m_Ammo--;
-	
+
 	if(!m_ReloadTimer)
-		m_ReloadTimer = g_pData->m_Weapons.m_aId[m_ActiveWeapon].m_Firedelay * Server()->TickSpeed() / 1000;
+	{
+		int firedelay = 1;
+
+		switch(m_ActiveWeapon)
+		{
+		case WEAPON_RIFLE:
+			firedelay = g_Config.m_SvLaserReload;
+			break;
+		case WEAPON_GRENADE:
+			firedelay = g_Config.m_SvGrenadeReload;
+			break;
+		case WEAPON_NINJA:
+			firedelay = g_pData->m_Weapons.m_aId[m_ActiveWeapon].m_Firedelay;
+			break;
+		}
+
+		if(m_pPlayer->award)
+			firedelay *= ((float)g_Config.m_SvKillingspreeAwardReload / (float)100);
+
+		m_ReloadTimer = firedelay * Server()->TickSpeed() / 1000;
+	}
 }
 
 void CCharacter::HandleWeapons()
@@ -512,11 +564,7 @@ void CCharacter::SetEmote(int Emote, int Tick)
 }
 
 void CCharacter::OnPredictedInput(CNetObj_PlayerInput *pNewInput)
-{
-	// check for changes
-	if(mem_comp(&m_Input, pNewInput, sizeof(CNetObj_PlayerInput)) != 0)
-		m_LastAction = Server()->Tick();
-		
+{		
 	// copy new input
 	mem_copy(&m_Input, pNewInput, sizeof(m_Input));
 	m_NumInputs++;
@@ -712,6 +760,10 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	
 	if(GameServer()->m_pController->IsFriendlyFire(m_pPlayer->GetCID(), From) && !g_Config.m_SvTeamdamage)
 		return false;
+
+	if(From == m_pPlayer->GetCID() && Weapon == WEAPON_GRENADE && !g_Config.m_SvGrenadeSelfdamage)
+		return false;
+		
 
 	//if(GameServer()->m_pController->is_instagib() && Weapon == WEAPON_GAME)
 		//return false;

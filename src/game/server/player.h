@@ -76,6 +76,7 @@ public:
 	int camp_tick;
 	vec2 camp_pos;
 	bool camp_sent;
+	bool award;
 	
 private:
 	CCharacter *Character;

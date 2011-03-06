@@ -320,7 +320,7 @@ void IGameController::OnPlayerInfoChange(class CPlayer *pP)
 int IGameController::OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon)
 {
 	// do scoreing
-	if(g_Config.m_SvKillingspree && g_Config.m_SvKillingspree_kills <= pVictim->GetPlayer()->killstreak)
+	if(g_Config.m_SvKillingspree && (pVictim->GetPlayer()->award || g_Config.m_SvKillingspreeKills <= pVictim->GetPlayer()->killstreak))
 	{
 		char buf[128];
 
@@ -328,9 +328,10 @@ int IGameController::OnCharacterDeath(class CCharacter *pVictim, class CPlayer *
 		GameServer()->SendBroadcast(buf, -1);
 
 		Server()->SetClientName(pVictim->GetPlayer()->GetCID(), pVictim->GetPlayer()->start_name);
+		pVictim->GetPlayer()->award = false;
 	}
 
-	if(!pKiller || Weapon == WEAPON_GAME)
+/*	if(!pKiller || Weapon == WEAPON_GAME)
 		return 0;
 	if(pKiller == pVictim->GetPlayer())
 		pVictim->GetPlayer()->m_Score--; // suicide
@@ -340,37 +341,45 @@ int IGameController::OnCharacterDeath(class CCharacter *pVictim, class CPlayer *
 			pKiller->m_Score--; // teamkill
 		else
 			pKiller->m_Score++; // normal kill
-	}
+	}*/
 	
 	pVictim->GetPlayer()->killstreak = 0;
 
 	if(pKiller && pKiller != pVictim->GetPlayer())
 	{
-		if(!(IsTeamplay() && pVictim->GetPlayer()->GetTeam() == pKiller->GetTeam()))
+		if(IsTeamplay() && pVictim->GetPlayer()->GetTeam() == pKiller->GetTeam())
+			pKiller->m_Score--; // teamkill
+		else
 		{
+			pKiller->m_Score++; // normal kill
 			pKiller->killstreak++;
 
-			if(g_Config.m_SvKillingspree && pKiller->killstreak % g_Config.m_SvKillingspree_kills == 0)
+			if(g_Config.m_SvKillingspree && pKiller->killstreak % g_Config.m_SvKillingspreeKills == 0)
 			{
 				char buf[128];
 	
 				char spree_note[5][32] = { "on a killing spree", "on a rampage", "dominating", "unstoppable", "godlike" };
-				int kspreemsgtype = (pKiller->killstreak / g_Config.m_SvKillingspree_kills) - 1;
-				if(kspreemsgtype > 4) kspreemsgtype = 4;
+				int kspreemsgtype = (pKiller->killstreak / g_Config.m_SvKillingspreeKills) - 1;
+				if(kspreemsgtype > 4) 
+					kspreemsgtype = 4;
 
 				str_format(buf, sizeof(buf), "%s is %s (%d kills)", Server()->ClientName(pKiller->GetCID()), spree_note[kspreemsgtype], pKiller->killstreak);
 				GameServer()->SendBroadcast(buf, -1);
 
 				char tmp[MAX_NAME_LENGTH];
 
-				if(g_Config.m_SvKillingspree_tag)
+				if(g_Config.m_SvKillingspreeTag)
 				{
 					str_format(tmp, sizeof(tmp),"[SPREE] ");
 					strncat(tmp, pKiller->start_name,MAX_NAME_LENGTH-9);
 					tmp[MAX_NAME_LENGTH-1]=0;
 					Server()->SetClientName(pKiller->GetCID(), tmp);
 				}
+
+				if(g_Config.m_SvKillingspreeAward)
+					pKiller->award = true;
 			}
+
 			return 0;
 		}
 	}
